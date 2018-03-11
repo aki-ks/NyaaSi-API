@@ -93,4 +93,19 @@ public interface NyaaSiAuthApi extends NyaaSiApi {
      */
     void editTorrent(int torrentId, Consumer<EditTorrentRequest> f);
 
+    /**
+     * Post a comment below a torrent.
+     *
+     * If you've just registered at nyaa.si you must solve a captcha
+     * before writing comments and cannot use this api call yet.
+     * After ~1 week the captcha should disappear.
+     *
+     * Since this api call is based on parsing webpages, it might break anytime.
+     *
+     * @throws CaptchaException you must solve a captcha
+     * @throws WebScrapeException error while parsing webpage
+     * @throws HttpException networking error
+     */
+    void writeComment(int torrentId, String message);
+
 }

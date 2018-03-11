@@ -238,4 +238,41 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
             default: throw new HttpErrorCodeException(statusCode);
         }
     }
+
+    private HttpResponse fetchViewTorrentPage(int torrentId, CookieStore store) {
+        HttpGet get = new HttpGet("https://" + domain + "/view/" + torrentId);
+        get.setConfig(HttpUtil.WITH_TIMEOUT);
+
+        return HttpUtil.executeRequest(get, store);
+    }
+
+    private String newWriteCommentCsrfToken(int torrentId) {
+        CookieStore cookieStore = new BasicCookieStore();
+        cookieStore.addCookie(session.toCookie());
+        HttpResponse response = fetchViewTorrentPage(torrentId, cookieStore);
+        return parsePage(response, new WriteCommentCsrfTokenParser());
+    }
+
+    @Override
+    public void writeComment(int torrentId, String message) {
+        String csrfToken = newWriteCommentCsrfToken(torrentId);
+
+        HttpPost post = new HttpPost("https://" + domain + "/view/" + torrentId);
+        post.setConfig(HttpUtil.WITH_TIMEOUT);
+
+        List<NameValuePair> form = new ArrayList<>();
+        form.add(new BasicNameValuePair("csrf_token", csrfToken));
+        form.add(new BasicNameValuePair("comment", message));
+        post.setEntity(new UrlEncodedFormEntity(form, Consts.UTF_8));
+
+        CookieStore cookieStore = new BasicCookieStore();
+        cookieStore.addCookie(session.toCookie());
+        HttpResponse response = HttpUtil.executeRequest(post, cookieStore);
+
+        if(response.getStatusLine().getStatusCode() == 302) {
+            response = fetchViewTorrentPage(torrentId, cookieStore);
+        }
+
+        parsePage(response, new ValidateWriteComment());
+    }
 }
