@@ -109,4 +109,15 @@ public interface NyaaSiAuthApi extends NyaaSiApi {
      */
     int writeComment(int torrentId, String message);
 
+    /**
+     * Delete a comment below a torrent.
+     *
+     * Since this api call is based on parsing webpages, it might break anytime.
+     *
+     * @throws PermissionException tried to delete comment from other user
+     * @throws WebScrapeException error while parsing webpage
+     * @throws HttpException networking error
+     */
+    void deleteComment(int torrentId, int commentId);
+
 }

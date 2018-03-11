@@ -278,4 +278,28 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
             throw new HttpErrorCodeException(statusCode);
         }
     }
+
+    @Override
+    public void deleteComment(int torrentId, int commentId) {
+        HttpPost post = new HttpPost("https://" + domain + "/view/" + torrentId + "/comment/" + commentId + "/delete");
+        post.setConfig(HttpUtil.WITH_TIMEOUT);
+
+        List<NameValuePair> form = new ArrayList<>();
+        form.add(new BasicNameValuePair("submit", ""));
+        post.setEntity(new UrlEncodedFormEntity(form, Consts.UTF_8));
+
+        CookieStore cookieStore = new BasicCookieStore();
+        cookieStore.addCookie(session.toCookie());
+        HttpResponse response = HttpUtil.executeRequest(post, cookieStore);
+
+        int statusCode = response.getStatusLine().getStatusCode();
+        switch (statusCode) {
+            case 302:
+                response = fetchViewTorrentPage(torrentId, cookieStore);
+                parsePage(response, new ValidateDeleteComment());
+                return;
+            case 403: throw new PermissionException();
+            default: throw new HttpErrorCodeException(statusCode);
+        }
+    }
 }
