@@ -102,10 +102,11 @@ public interface NyaaSiAuthApi extends NyaaSiApi {
      *
      * Since this api call is based on parsing webpages, it might break anytime.
      *
+     * @return comment id
      * @throws CaptchaException you must solve a captcha
      * @throws WebScrapeException error while parsing webpage
      * @throws HttpException networking error
      */
-    void writeComment(int torrentId, String message);
+    int writeComment(int torrentId, String message);
 
 }

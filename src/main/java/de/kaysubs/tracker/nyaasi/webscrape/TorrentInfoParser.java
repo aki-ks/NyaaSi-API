@@ -3,13 +3,9 @@ package de.kaysubs.tracker.nyaasi.webscrape;
 import de.kaysubs.tracker.nyaasi.model.SubCategory;
 import de.kaysubs.tracker.nyaasi.exception.WebScrapeException;
 import de.kaysubs.tracker.nyaasi.model.*;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,6 +17,15 @@ import java.util.regex.Pattern;
 
 public class TorrentInfoParser implements Parser<TorrentInfo> {
     private final static Pattern COMMENT_DIV_ID_PATTERN = Pattern.compile("torrent-comment([0-9]+)");
+
+    public static int parseCommentDivId(String divId) {
+        Matcher matcher = COMMENT_DIV_ID_PATTERN.matcher(divId);
+        if(matcher.matches()) {
+            return Integer.parseInt(matcher.group(1));
+        } else {
+            throw new WebScrapeException("Cannot parse comment ID");
+        }
+    }
 
     @Override
     public TorrentInfo parsePage(Document page, boolean isSukebei) {
@@ -120,18 +125,9 @@ public class TorrentInfoParser implements Parser<TorrentInfo> {
                 .attr("data-timestamp"));
 
         Element commentDiv = commentPanel.selectFirst("div.comment-content");
-        int commentId = parseCommentDivId(commentDiv.attr("id"));
+        int torrentId = parseCommentDivId(commentDiv.attr("id"));
 
-        return new TorrentInfo.Comment(commentId, username, isTrusted, avatar, date, commentDiv);
-    }
-
-    private int parseCommentDivId(String divId) {
-        Matcher matcher = COMMENT_DIV_ID_PATTERN.matcher(divId);
-        if(matcher.matches()) {
-            return Integer.parseInt(matcher.group(1));
-        } else {
-            throw new WebScrapeException("Cannot parse comment ID");
-        }
+        return new TorrentInfo.Comment(torrentId, username, isTrusted, avatar, date, commentDiv);
     }
 
     private void parseFileList(Document page, TorrentInfo info) {

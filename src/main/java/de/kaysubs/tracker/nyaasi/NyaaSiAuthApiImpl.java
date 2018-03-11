@@ -254,7 +254,7 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
     }
 
     @Override
-    public void writeComment(int torrentId, String message) {
+    public int writeComment(int torrentId, String message) {
         String csrfToken = newWriteCommentCsrfToken(torrentId);
 
         HttpPost post = new HttpPost("https://" + domain + "/view/" + torrentId);
@@ -269,10 +269,13 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         cookieStore.addCookie(session.toCookie());
         HttpResponse response = HttpUtil.executeRequest(post, cookieStore);
 
-        if(response.getStatusLine().getStatusCode() == 302) {
+        int statusCode = response.getStatusLine().getStatusCode();
+        if(statusCode == 302) {
+            String redirectUrl = response.getFirstHeader("Location").getValue();
             response = fetchViewTorrentPage(torrentId, cookieStore);
+            return parsePage(response, new WriteCommentResponseParser(redirectUrl));
+        } else {
+            throw new HttpErrorCodeException(statusCode);
         }
-
-        parsePage(response, new ValidateWriteComment());
     }
 }
