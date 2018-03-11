@@ -11,11 +11,11 @@ public class CommentExamples {
         Scanner sc = new Scanner(System.in);
         int torrentId = sc.nextInt();
 
-        writeComment(api, torrentId);
-    }
+        int commentId = api.writeComment(torrentId, "I'm testing a nyaa.si api");
+        System.out.println("Example comment has id " + commentId);
 
-    public static int writeComment(NyaaSiAuthApi api, int torrentId) {
-        return api.writeComment(torrentId, "I'm testing a nyaa.si api");
+        api.deleteComment(torrentId, commentId);
+        System.out.println("Deleted example comment again");
     }
 
 }
