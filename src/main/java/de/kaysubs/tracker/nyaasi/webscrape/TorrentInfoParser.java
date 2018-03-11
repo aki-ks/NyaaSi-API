@@ -18,13 +18,6 @@ import java.util.Date;
 import java.util.Optional;
 
 public class TorrentInfoParser implements Parser<TorrentInfo> {
-    public static Document testPage() throws IOException {
-        return Jsoup.parse(new java.io.File("/home/user/development/java/tracker/f1.html"), "UTF-8");
-    }
-
-    public static TorrentInfo test() throws IOException {
-        return new TorrentInfoParser().parsePage(testPage(), false);
-    }
 
     @Override
     public TorrentInfo parsePage(Document page, boolean isSukebei) {
