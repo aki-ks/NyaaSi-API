@@ -26,18 +26,24 @@ public class TorrentInfo {
     private Comment[] comments;
 
     public static class Comment {
+        private final int commentId;
         private final String username;
         private final boolean isTrusted;
         private final String avatar;
         private final Date date;
         private final Element commentDiv;
 
-        public Comment(String username, boolean isTrusted, String avatar, Date date, Element commentDiv) {
+        public Comment(int commentId, String username, boolean isTrusted, String avatar, Date date, Element commentDiv) {
+            this.commentId = commentId;
             this.username = username;
             this.isTrusted = isTrusted;
             this.avatar = avatar;
             this.date = date;
             this.commentDiv = commentDiv;
+        }
+
+        public int getCommentId() {
+            return commentId;
         }
 
         public String getUsername() {

@@ -16,8 +16,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TorrentInfoParser implements Parser<TorrentInfo> {
+    private final static Pattern COMMENT_DIV_ID_PATTERN = Pattern.compile("torrent-comment([0-9]+)");
 
     @Override
     public TorrentInfo parsePage(Document page, boolean isSukebei) {
@@ -112,15 +115,23 @@ public class TorrentInfoParser implements Parser<TorrentInfo> {
 
         String username = userLink.text();
         boolean isTrusted = userLink.attr("title").equals("Trusted");
-//        boolean isUploader = userLink.siblingNodes().stream().anyMatch(node -> node instanceof TextNode &&
-//                ((TextNode) node).text().trim().equals("(uploader)"));
         String avatar = commentPanel.selectFirst("img.avatar").attr("src");
         Date date = ParseUtils.parseTimeStamp(commentPanel.selectFirst("small[data-timestamp]")
                 .attr("data-timestamp"));
 
         Element commentDiv = commentPanel.selectFirst("div.comment-content");
+        int commentId = parseCommentDivId(commentDiv.attr("id"));
 
-        return new TorrentInfo.Comment(username, isTrusted, avatar, date, commentDiv);
+        return new TorrentInfo.Comment(commentId, username, isTrusted, avatar, date, commentDiv);
+    }
+
+    private int parseCommentDivId(String divId) {
+        Matcher matcher = COMMENT_DIV_ID_PATTERN.matcher(divId);
+        if(matcher.matches()) {
+            return Integer.parseInt(matcher.group(1));
+        } else {
+            throw new WebScrapeException("Cannot parse comment ID");
+        }
     }
 
     private void parseFileList(Document page, TorrentInfo info) {
