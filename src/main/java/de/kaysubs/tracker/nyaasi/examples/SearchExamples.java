@@ -43,14 +43,14 @@ public class SearchExamples {
 
     public static void filterByCategory() {
         NyaaSiApi.getNyaa().search(new SearchRequest()
-                .setCategory(MainCategory.Nyaa.ANIME));
+                .setCategory(MainCategory.Nyaa.anime));
 
         NyaaSiApi.getNyaa().search(new SearchRequest()
-                .setCategory(Category.Nyaa.Anime.ENGLISH));
+                .setCategory(Category.Nyaa.anime.english));
 
-        // Use Category.Sukebei / MainCategory.Sukebei to search on sukebei.nyaa.si
+        // Use Category.Sukebei when searching on sukebei.nyaa.si
         NyaaSiApi.getSukebei().search(new SearchRequest()
-                .setCategory(Category.Sukebei.Art.ANIME));
+                .setCategory(Category.Sukebei.art.anime));
     }
 
     public static void usingFilters() {

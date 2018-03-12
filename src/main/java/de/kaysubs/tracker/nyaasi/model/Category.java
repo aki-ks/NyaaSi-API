@@ -1,5 +1,7 @@
 package de.kaysubs.tracker.nyaasi.model;
 
+import java.util.Arrays;
+
 public interface Category {
     int getMainCategoryId();
     int getSubCategoryId();
@@ -10,123 +12,115 @@ public interface Category {
             return false;
         }
 
-        enum Anime implements SubCategory, Category.Nyaa {
-            AMV(1), ENGLISH(2), NON_ENGLISH(3), RAW(4);
+        AnimeMainCategory anime = new AnimeMainCategory();
+        AudioMainCategory audio = new AudioMainCategory();
+        LiteratureMainCategory literature = new LiteratureMainCategory();
+        LiveActionMainCategory liveAction = new LiveActionMainCategory();
+        PicturesMainCategory pictures = new PicturesMainCategory();
+        SoftwareMainCategory software = new SoftwareMainCategory();
 
-            private final int subId;
+        MainCategory[] mainCategories = new MainCategory[] {
+                anime, audio, literature, liveAction, pictures, software
+        };
 
-            Anime(int subId) {
-                this.subId = subId;
+        static MainCategory fromId(int mainCategoryId) {
+            return Arrays.stream(Nyaa.mainCategories)
+                    .filter(c -> c.getMainCategoryId() == mainCategoryId).findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("No nyaa MainCategory with id " + mainCategoryId));
+        }
+
+        class AnimeMainCategory implements MainCategory, Category.Nyaa {
+            public final SubCategory amv = new SubCategory(this, "AMV", 1);
+            public final SubCategory english = new SubCategory(this, "English", 2);
+            public final SubCategory nonEnglish = new SubCategory(this, "NonEnglish", 3);
+            public final SubCategory raw = new SubCategory(this, "Raw", 4);
+
+            @Override
+            public SubCategory[] getSubCategories() {
+                return new SubCategory[] { amv, english, nonEnglish, raw };
             }
 
             @Override
-            public int getSubCategoryId() {
-                return subId;
-            }
-
-            @Override
-            public MainCategory.Nyaa getMainCategory() {
-                return MainCategory.Nyaa.ANIME;
+            public int getMainCategoryId() {
+                return 1;
             }
         }
 
-        enum Audio implements SubCategory, Category.Nyaa {
-            LOSSLESS(1), LOSSY(2);
+        class AudioMainCategory implements MainCategory, Category.Nyaa {
+            public final SubCategory lossless = new SubCategory(this, "AMV", 1);
+            public final SubCategory lossy = new SubCategory(this, "English", 2);
 
-            private final int subId;
-
-            Audio(int subId) {
-                this.subId = subId;
+            @Override
+            public SubCategory[] getSubCategories() {
+                return new SubCategory[] { lossless, lossy };
             }
 
             @Override
-            public int getSubCategoryId() {
-                return subId;
-            }
-
-            @Override
-            public MainCategory.Nyaa getMainCategory() {
-                return MainCategory.Nyaa.AUDIO;
+            public int getMainCategoryId() {
+                return 2;
             }
         }
 
-        enum Literature implements SubCategory, Category.Nyaa {
-            ENGLISH(1), NON_ENGLISH(2), RAW(3);
+        class LiteratureMainCategory implements MainCategory, Category.Nyaa {
+            public final SubCategory english = new SubCategory(this, "English", 1);
+            public final SubCategory nonEnglish = new SubCategory(this, "NonEnglish", 2);
+            public final SubCategory raw = new SubCategory(this, "Raw", 3);
 
-            private final int subId;
-
-            Literature(int subId) {
-                this.subId = subId;
+            @Override
+            public SubCategory[] getSubCategories() {
+                return new SubCategory[] { english, nonEnglish, raw };
             }
 
             @Override
-            public int getSubCategoryId() {
-                return subId;
-            }
-
-            @Override
-            public MainCategory.Nyaa getMainCategory() {
-                return MainCategory.Nyaa.LITERATURE;
+            public int getMainCategoryId() {
+                return 3;
             }
         }
 
-        enum LiveAction implements SubCategory, Category.Nyaa {
-            ENGLISH(1), IDOL(2), NON_ENGLISH(3), RAW(4);
+        class LiveActionMainCategory implements MainCategory, Category.Nyaa {
+            public final SubCategory english = new SubCategory(this, "English", 1);
+            public final SubCategory idol = new SubCategory(this, "Idol", 2);
+            public final SubCategory nonEnglish = new SubCategory(this, "NonEnglish", 3);
+            public final SubCategory raw = new SubCategory(this, "Raw", 4);
 
-            private final int subId;
-
-            LiveAction(int subId) {
-                this.subId = subId;
+            @Override
+            public SubCategory[] getSubCategories() {
+                return new SubCategory[] { english, idol, nonEnglish, raw };
             }
 
             @Override
-            public int getSubCategoryId() {
-                return subId;
-            }
-
-            @Override
-            public MainCategory.Nyaa getMainCategory() {
-                return MainCategory.Nyaa.LIVE_ACTION;
+            public int getMainCategoryId() {
+                return 4;
             }
         }
 
-        enum Pictures implements SubCategory, Category.Nyaa {
-            GRAPHICS(1), PHOTOS(2);
+        class PicturesMainCategory implements MainCategory, Category.Nyaa {
+            public final SubCategory graphics = new SubCategory(this, "Graphics", 1);
+            public final SubCategory photos = new SubCategory(this, "Photos", 2);
 
-            private final int subId;
-
-            Pictures(int subId) {
-                this.subId = subId;
+            @Override
+            public SubCategory[] getSubCategories() {
+                return new SubCategory[] { graphics, photos };
             }
 
             @Override
-            public int getSubCategoryId() {
-                return subId;
-            }
-
-            @Override
-            public MainCategory.Nyaa getMainCategory() {
-                return MainCategory.Nyaa.PICTURES;
+            public int getMainCategoryId() {
+                return 5;
             }
         }
 
-        enum Software implements SubCategory, Category.Nyaa {
-            APPS(1), GAMES(2);
+        class SoftwareMainCategory implements MainCategory, Category.Nyaa {
+            public final SubCategory applications = new SubCategory(this, "Applications", 1);
+            public final SubCategory games = new SubCategory(this, "Games", 2);
 
-            private final int subId;
-
-            Software(int subId) {
-                this.subId = subId;
+            @Override
+            public SubCategory[] getSubCategories() {
+                return new SubCategory[] { applications, games };
             }
 
             @Override
-            public int getSubCategoryId() {
-                return subId;
-            }
-
-            @Override
-            public MainCategory.Nyaa getMainCategory() {
-                return MainCategory.Nyaa.SOFTWARE;
+            public int getMainCategoryId() {
+                return 6;
             }
         }
     }
@@ -136,44 +130,51 @@ public interface Category {
             return true;
         }
 
-        enum Art implements SubCategory, Category.Sukebei {
-            ANIME(1), DOUJINSHI(2), GAMES(3), MANGA(4), PICTURES(5);
+        ArtMainCategory art = new ArtMainCategory();
+        RealLifeMainCategory realLife = new RealLifeMainCategory();
 
-            private final int subId;
+        MainCategory[] mainCategories = new MainCategory[] {
+                art, realLife
+        };
 
-            Art(int subId) {
-                this.subId = subId;
+        static MainCategory fromId(int mainCategoryId) {
+            return Arrays.stream(Sukebei.mainCategories)
+                    .filter(c -> c.getMainCategoryId() == mainCategoryId).findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("No sukebei MainCategory with id " + mainCategoryId));
+        }
+
+        class ArtMainCategory implements MainCategory, Category.Sukebei {
+            public final SubCategory anime = new SubCategory(this, "Anime", 1);
+            public final SubCategory doujinshi = new SubCategory(this, "Doujinshi", 2);
+            public final SubCategory games = new SubCategory(this, "Games", 3);
+            public final SubCategory manga = new SubCategory(this, "Manga", 4);
+            public final SubCategory pictures = new SubCategory(this, "Pictures", 5);
+
+            @Override
+            public SubCategory[] getSubCategories() {
+                return new SubCategory[] { anime, doujinshi, games, manga, pictures };
             }
 
             @Override
-            public int getSubCategoryId() {
-                return subId;
-            }
-
-            @Override
-            public MainCategory.Sukebei getMainCategory() {
-                return MainCategory.Sukebei.ART;
+            public int getMainCategoryId() {
+                return 1;
             }
         }
 
-        enum RealLife implements SubCategory, Category.Sukebei {
-            PICTURES(1), VIDEOS(2);
+        class RealLifeMainCategory implements MainCategory, Category.Sukebei {
+            public final SubCategory pictures = new SubCategory(this, "Pictures", 1);
+            public final SubCategory videos = new SubCategory(this, "Videos", 2);
 
-            private final int subId;
-
-            RealLife(int subId) {
-                this.subId = subId;
+            @Override
+            public SubCategory[] getSubCategories() {
+                return new SubCategory[] { pictures, videos };
             }
 
             @Override
-            public int getSubCategoryId() {
-                return subId;
-            }
-
-            @Override
-            public MainCategory.Sukebei getMainCategory() {
-                return MainCategory.Sukebei.READ_LIFE;
+            public int getMainCategoryId() {
+                return 2;
             }
         }
+
     }
 }

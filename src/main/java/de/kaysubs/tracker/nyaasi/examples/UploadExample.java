@@ -24,8 +24,8 @@ public class UploadExample {
 
     private static int uploadTorrent(NyaaSiAuthApi api, File seedfile) {
         SubCategory category = api.isSukebei() ?
-                Category.Sukebei.Art.GAMES :
-                Category.Nyaa.Software.GAMES;
+                Category.Sukebei.art.games :
+                Category.Nyaa.software.games;
 
         int torrentId = api.uploadTorrent(new UploadTorrentRequest(seedfile, "API test torrent", category)
                 .setDescription("This is an example torrent uploaded through 'k subs nyaa.si API.")
