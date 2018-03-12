@@ -1,15 +1,41 @@
 package de.kaysubs.tracker.nyaasi.model;
 
-public interface MainCategory extends Category {
-    SubCategory[] getSubCategories();
+import java.util.Arrays;
 
-    int getMainCategoryId();
+public abstract class MainCategory implements Category {
 
-    default int getSubCategoryId() {
+    private final int id;
+    private SubCategory[] subCategories;
+
+    public MainCategory(int id) {
+        this.id = id;
+    }
+
+    public SubCategory[] getSubCategories() {
+        if(subCategories == null) {
+            subCategories = Arrays.stream(getClass().getDeclaredFields())
+                    .filter(field -> SubCategory.class.isAssignableFrom(field.getType()))
+                    .map(field -> {
+                        try {
+                            return (SubCategory) field.get(this);
+                        } catch (IllegalAccessException e) {
+                            throw new IllegalStateException("This should never happen. All fields are public.", e);
+                        }
+                    }).toArray(SubCategory[]::new);
+        }
+
+        return subCategories;
+    }
+
+    public int getMainCategoryId() {
+        return id;
+    }
+
+    public int getSubCategoryId() {
         return 0;
     }
 
-    default SubCategory getSubcategoryFromId(int subId) {
+    public SubCategory getSubcategoryFromId(int subId) {
         for (SubCategory subCategory : getSubCategories())
             if (subCategory.getSubCategoryId() == subId)
                 return subCategory;
