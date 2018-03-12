@@ -239,6 +239,12 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         }
     }
 
+    private HttpResponse fetchViewTorrentPage(int torrentId) {
+        CookieStore cookieStore = new BasicCookieStore();
+        cookieStore.addCookie(session.toCookie());
+        return fetchViewTorrentPage(torrentId, cookieStore);
+    }
+
     private HttpResponse fetchViewTorrentPage(int torrentId, CookieStore store) {
         HttpGet get = new HttpGet("https://" + domain + "/view/" + torrentId);
         get.setConfig(HttpUtil.WITH_TIMEOUT);
@@ -247,9 +253,7 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
     }
 
     private String newWriteCommentCsrfToken(int torrentId) {
-        CookieStore cookieStore = new BasicCookieStore();
-        cookieStore.addCookie(session.toCookie());
-        HttpResponse response = fetchViewTorrentPage(torrentId, cookieStore);
+        HttpResponse response = fetchViewTorrentPage(torrentId);
         return parsePage(response, new WriteCommentCsrfTokenParser());
     }
 
@@ -276,6 +280,32 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
             return parsePage(response, new WriteCommentResponseParser(redirectUrl));
         } else {
             throw new HttpErrorCodeException(statusCode);
+        }
+    }
+
+    private String newEditCommentCsrfToken(int torrentId, int commentId) {
+        HttpResponse response = fetchViewTorrentPage(torrentId);
+        return parsePage(response, new EditCommentCsrfTokenParser(commentId));
+    }
+
+    @Override
+    public void editComment(int torrentId, int commentId, String newMessage) {
+        String csrfToken = newEditCommentCsrfToken(torrentId, commentId);
+
+        HttpPost post = new HttpPost("https://" + domain + "/view/" + torrentId + "/comment/" + commentId + "/edit");
+
+        List<NameValuePair> form = new ArrayList<>();
+        form.add(new BasicNameValuePair("csrf_token", csrfToken));
+        form.add(new BasicNameValuePair("comment", newMessage));
+        post.setEntity(new UrlEncodedFormEntity(form, Consts.UTF_8));
+
+        HttpResponse response = HttpUtil.executeRequest(post, new Cookie[] { session.toCookie() });
+
+        int statusCode = response.getStatusLine().getStatusCode();
+        switch (statusCode) {
+            case 200: return;
+            case 400: throw new CannotEditException();
+            default: throw new HttpErrorCodeException(statusCode);
         }
     }
 

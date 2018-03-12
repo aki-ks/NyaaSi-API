@@ -110,6 +110,20 @@ public interface NyaaSiAuthApi extends NyaaSiApi {
     int writeComment(int torrentId, String message);
 
     /**
+     * Edit a comment below a torrent.
+     *
+     * Comments can only be edited within one  hour after they've posted.
+     *
+     * Since this api call is based on parsing webpages, it might break anytime.
+     *
+     * @throws NoSuchCommentException comment does not exist
+     * @throws CannotEditException torrent cannot be edited
+     * @throws WebScrapeException error while parsing webpage
+     * @throws HttpException networking error
+     */
+    void editComment(int torrentId, int commentId, String newMessage);
+
+    /**
      * Delete a comment below a torrent.
      *
      * Since this api call is based on parsing webpages, it might break anytime.
