@@ -104,6 +104,7 @@ public interface NyaaSiAuthApi extends NyaaSiApi {
      *
      * @return comment id
      * @throws CaptchaException you must solve a captcha
+     * @throws NoSuchTorrentException the torrent does not exist
      * @throws WebScrapeException error while parsing webpage
      * @throws HttpException networking error
      */
@@ -117,6 +118,7 @@ public interface NyaaSiAuthApi extends NyaaSiApi {
      * Since this api call is based on parsing webpages, it might break anytime.
      *
      * @throws NoSuchCommentException comment does not exist
+     * @throws NoSuchTorrentException the torrent does not exist
      * @throws CannotEditException torrent cannot be edited
      * @throws WebScrapeException error while parsing webpage
      * @throws HttpException networking error
@@ -128,6 +130,7 @@ public interface NyaaSiAuthApi extends NyaaSiApi {
      *
      * Since this api call is based on parsing webpages, it might break anytime.
      *
+     * @throws NoSuchCommentException comment does not exist
      * @throws PermissionException tried to delete comment from other user
      * @throws WebScrapeException error while parsing webpage
      * @throws HttpException networking error

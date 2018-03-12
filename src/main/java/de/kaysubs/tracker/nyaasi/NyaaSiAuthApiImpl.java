@@ -249,7 +249,14 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         HttpGet get = new HttpGet("https://" + domain + "/view/" + torrentId);
         get.setConfig(HttpUtil.WITH_TIMEOUT);
 
-        return HttpUtil.executeRequest(get, store);
+        HttpResponse response = HttpUtil.executeRequest(get, store);
+
+        int statusCode = response.getStatusLine().getStatusCode();
+        switch (statusCode) {
+            case 200: return response;
+            case 404: throw new NoSuchTorrentException(torrentId);
+            default: throw new HttpErrorCodeException(statusCode);
+        }
     }
 
     private String newWriteCommentCsrfToken(int torrentId) {
@@ -329,6 +336,7 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
                 parsePage(response, new ValidateDeleteComment());
                 return;
             case 403: throw new PermissionException();
+            case 404: throw new NoSuchCommentException();
             default: throw new HttpErrorCodeException(statusCode);
         }
     }
