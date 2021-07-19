@@ -7,6 +7,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+/**
+ * @deprecated CSRF tokens are no longer used on nyaa.si/sukebei.nyaa.si.
+ */
+@Deprecated
 public class EditCommentCsrfTokenParser implements Parser<String> {
     private final int commentId;
 

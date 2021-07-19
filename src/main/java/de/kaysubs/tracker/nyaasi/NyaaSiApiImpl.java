@@ -129,24 +129,25 @@ public class NyaaSiApiImpl implements NyaaSiApi {
         return parsePage(response, new TorrentInfoParser());
     }
 
-    private String newLoginCsrfToken(CookieStore store) {
-        HttpGet get = new HttpGet("https://" + domain + "/login");
-        get.setConfig(HttpUtil.WITH_TIMEOUT);
-
-        HttpResponse response = HttpUtil.executeRequest(get, store);
-        return parsePage(response, new LoginCsrfTokenParser());
+    @Override
+    public NyaaSiAuthApi login(String sessionCookie) {
+        Session session = new Session(sessionCookie, isSukebei);
+        return new NyaaSiAuthApiImpl(session);
     }
 
+    /**
+     * @deprecated No longer works due to Google Captcha. Set session cookie manually
+     * by logging in through the browser and retrieving it from cookies in developer
+     * tools.
+     */
     @Override
+    @Deprecated
     public NyaaSiAuthApi login(String username, String password) {
         CookieStore store = new BasicCookieStore();
-        String csrfToken = newLoginCsrfToken(store);
-
         HttpPost post = new HttpPost("https://" + domain + "/login");
         post.setConfig(HttpUtil.WITH_TIMEOUT);
 
         List<NameValuePair> form = new ArrayList<>();
-        form.add(new BasicNameValuePair("csrf_token", csrfToken));
         form.add(new BasicNameValuePair("username", username));
         form.add(new BasicNameValuePair("password", password));
         post.setEntity(new UrlEncodedFormEntity(form, Consts.UTF_8));
@@ -159,7 +160,7 @@ public class NyaaSiApiImpl implements NyaaSiApi {
             throw new LoginException();
         } else {
             Session session = sessionFromCookies(store.getCookies());
-            return new NyaaSiAuthApiImpl(session, isSukebei);
+            return new NyaaSiAuthApiImpl(session);
         }
     }
 

@@ -1,7 +1,6 @@
 package de.kaysubs.tracker.nyaasi.model;
 
 public class EditTorrentRequest {
-    private final String csrfToken;
     private String name;
     private SubCategory category;
     private String information;
@@ -11,9 +10,18 @@ public class EditTorrentRequest {
     private boolean isRemake;
     private boolean isCompleted;
 
+    /**
+     * @deprecated CSRF tokens are no longer used on nyaa.si.
+     * Use {@link #EditTorrentRequest(String, SubCategory, String, String, boolean, boolean, boolean, boolean)} instead.
+     */
+    @Deprecated
     public EditTorrentRequest(String csrfToken, String name, SubCategory category, String information, String description,
                               boolean isAnonymous, boolean isHidden, boolean isRemake, boolean isCompleted) {
-        this.csrfToken = csrfToken;
+        this(name, category, information, description, isAnonymous, isHidden, isRemake, isCompleted);
+    }
+
+    public EditTorrentRequest(String name, SubCategory category, String information, String description,
+                              boolean isAnonymous, boolean isHidden, boolean isRemake, boolean isCompleted) {
         this.name = name;
         this.category = category;
         this.information = information;
@@ -22,10 +30,6 @@ public class EditTorrentRequest {
         this.isHidden = isHidden;
         this.isRemake = isRemake;
         this.isCompleted = isCompleted;
-    }
-
-    public String getCsrfToken() {
-        return csrfToken;
     }
 
     public SubCategory getCategory() {

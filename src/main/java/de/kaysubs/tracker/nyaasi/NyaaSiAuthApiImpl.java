@@ -29,8 +29,8 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
 
     private final Session session;
 
-    public NyaaSiAuthApiImpl(Session session, boolean isSukebei) {
-        super(isSukebei);
+    public NyaaSiAuthApiImpl(Session session) {
+        super(session.isSubekei());
         this.session = session;
     }
 
@@ -57,13 +57,10 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
 
     @Override
     public void changeEmail(String currentPassword, String newEmail) {
-        String csrfToken = parsePage(fetchAccountInfoPage(), new AccountInfoCsrfTokenParser()).getEmailToken();
-
         HttpPost post = new HttpPost("https://" + domain + "/profile");
         post.setConfig(HttpUtil.WITH_TIMEOUT);
 
         List<NameValuePair> form = new ArrayList<>();
-        form.add(new BasicNameValuePair("csrf_token", csrfToken));
         form.add(new BasicNameValuePair("email", newEmail));
         form.add(new BasicNameValuePair("current_password", currentPassword));
         post.setEntity(new UrlEncodedFormEntity(form, Consts.UTF_8));
@@ -81,12 +78,10 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         if(currentPassword.isEmpty())
             throw new LoginException();
 
-        String csrfToken = parsePage(fetchAccountInfoPage(), new AccountInfoCsrfTokenParser()).getPasswordToken();
         HttpPost post = new HttpPost("https://" + domain + "/profile");
         post.setConfig(HttpUtil.WITH_TIMEOUT);
 
         List<NameValuePair> form = new ArrayList<>();
-        form.add(new BasicNameValuePair("csrf_token", csrfToken));
         form.add(new BasicNameValuePair("current_password", currentPassword));
         form.add(new BasicNameValuePair("new_password", newPassword));
         form.add(new BasicNameValuePair("password_confirm", newPassword));
@@ -107,22 +102,12 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         parsePage(response, new ValidatePasswordChange());
     }
 
-    private String newUploadCsrfToken() {
-        HttpGet get = new HttpGet("https://" + domain + "/upload");
-        get.setConfig(HttpUtil.WITH_TIMEOUT);
-
-        HttpResponse response = HttpUtil.executeRequest(get, new Cookie[] { session.toCookie() });
-        return parsePage(response, new UploadCsrfTokenParser());
-    }
-
     @Override
     public int uploadTorrent(UploadTorrentRequest request) {
         HttpPost post = new HttpPost("https://" + domain + "/upload");
         post.setConfig(HttpUtil.WITH_TIMEOUT);
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-
-        builder.addTextBody("csrf_token", newUploadCsrfToken());
 
         ContentType torrentMime = ContentType.create("application/x-bittorrent");
         builder.addBinaryBody("torrent_file", request.getSeedfile(), torrentMime, request.getSeedfile().getName());
@@ -168,29 +153,12 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         }
     }
 
-    private String newDeleteCsrfToken(int torrentId) {
-        HttpGet get = new HttpGet("https://" + domain + "/view/" + torrentId + "/edit");
-        get.setConfig(HttpUtil.WITH_TIMEOUT);
-
-        HttpResponse response = HttpUtil.executeRequest(get, new Cookie[] { session.toCookie() });
-        int statusCode = response.getStatusLine().getStatusCode();
-        switch (statusCode) {
-            case 200: return parsePage(response, new DeleteCsrfTokenParser());
-            case 403: throw new PermissionException();
-            case 404: throw new NoSuchTorrentException(torrentId);
-            default: throw new HttpErrorCodeException(statusCode);
-        }
-    }
-
     @Override
     public void deleteTorrent(int torrentId) {
-        String csrfToken = newDeleteCsrfToken(torrentId);
-
         HttpPost post = new HttpPost("https://" + domain + "/view/" + torrentId + "/edit");
         post.setConfig(HttpUtil.WITH_TIMEOUT);
 
         List<NameValuePair> form = new ArrayList<>();
-        form.add(new BasicNameValuePair("csrf_token", csrfToken));
         form.add(new BasicNameValuePair("delete", "Delete"));
         post.setEntity(new UrlEncodedFormEntity(form, Consts.UTF_8));
 
@@ -209,7 +177,6 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
 
         SubCategory c = request.getCategory();
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addTextBody("csrf_token", request.getCsrfToken());
         builder.addTextBody("display_name", request.getName());
         builder.addTextBody("category", c.getMainCategoryId() + "_" + c.getSubCategoryId());
         builder.addTextBody("information", request.getInformation());
@@ -259,20 +226,12 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         }
     }
 
-    private String newWriteCommentCsrfToken(int torrentId) {
-        HttpResponse response = fetchViewTorrentPage(torrentId);
-        return parsePage(response, new WriteCommentCsrfTokenParser());
-    }
-
     @Override
     public int writeComment(int torrentId, String message) {
-        String csrfToken = newWriteCommentCsrfToken(torrentId);
-
         HttpPost post = new HttpPost("https://" + domain + "/view/" + torrentId);
         post.setConfig(HttpUtil.WITH_TIMEOUT);
 
         List<NameValuePair> form = new ArrayList<>();
-        form.add(new BasicNameValuePair("csrf_token", csrfToken));
         form.add(new BasicNameValuePair("comment", message));
         post.setEntity(new UrlEncodedFormEntity(form, Consts.UTF_8));
 
@@ -290,19 +249,11 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         }
     }
 
-    private String newEditCommentCsrfToken(int torrentId, int commentId) {
-        HttpResponse response = fetchViewTorrentPage(torrentId);
-        return parsePage(response, new EditCommentCsrfTokenParser(commentId));
-    }
-
     @Override
     public void editComment(int torrentId, int commentId, String newMessage) {
-        String csrfToken = newEditCommentCsrfToken(torrentId, commentId);
-
         HttpPost post = new HttpPost("https://" + domain + "/view/" + torrentId + "/comment/" + commentId + "/edit");
 
         List<NameValuePair> form = new ArrayList<>();
-        form.add(new BasicNameValuePair("csrf_token", csrfToken));
         form.add(new BasicNameValuePair("comment", newMessage));
         post.setEntity(new UrlEncodedFormEntity(form, Consts.UTF_8));
 

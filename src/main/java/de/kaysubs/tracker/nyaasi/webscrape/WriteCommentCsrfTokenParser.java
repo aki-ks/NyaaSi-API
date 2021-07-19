@@ -4,6 +4,10 @@ import de.kaysubs.tracker.nyaasi.exception.CaptchaException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+/**
+ * @deprecated CSRF tokens are no longer used on nyaa.si/sukebei.nyaa.si.
+ */
+@Deprecated
 public class WriteCommentCsrfTokenParser implements Parser<String> {
     @Override
     public String parsePage(Document page, boolean isSukebei) {
