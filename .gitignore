@@ -1,4 +1,12 @@
-/project
-/target
+*.iml
+.idea/
 *.class
-hs_err_*
+target/
+build/
+out/
+project/
+*.log
+*.tar
+.gradle
+
+
