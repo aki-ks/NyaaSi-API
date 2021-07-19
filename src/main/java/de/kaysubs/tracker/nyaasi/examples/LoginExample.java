@@ -14,12 +14,10 @@ public class LoginExample {
         Scanner sc = new Scanner(System.in);
         System.out.print("login at sukebei [true/false]: ");
         boolean isSukebei = sc.nextBoolean();
-        System.out.print("username: ");
-        String username = sc.next();
-        System.out.print("password: ");
-        String password = sc.next();
+        System.out.print("session cookie (log in at https://" + (isSukebei ? "sukebei." : "") + "nyaa.si/login and paste your session token from cookies here):");
+        String sessionCookie = sc.next();
 
         NyaaSiApi api = isSukebei ? NyaaSiApi.getSukebei() : NyaaSiApi.getNyaa();
-        return api.login(username, password);
+        return api.login(sessionCookie);
     }
 }
