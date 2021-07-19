@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'java-library'
+}
+
+group 'de.kaysubs'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.aki-ks:kaysub-commons:master-SNAPSHOT'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.5'
+    implementation 'org.apache.httpcomponents:httpmime:4.5.5'
+    implementation 'org.jsoup:jsoup:1.11.2'
+}
