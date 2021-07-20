@@ -112,7 +112,7 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         ContentType torrentMime = ContentType.create("application/x-bittorrent");
         builder.addBinaryBody("torrent_file", request.getSeedfile(), torrentMime, request.getSeedfile().getName());
 
-        builder.addTextBody("display_name", request.getName());
+        builder.addTextBody("display_name", request.getName(), ContentType.create("text/plain", Consts.UTF_8));
 
         SubCategory c = request.getCategory();
         if(c.isSukebei() != isSukebei)
@@ -133,7 +133,7 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         if(request.isCompleted())
             builder.addTextBody("is_complete", "y");
 
-        builder.addTextBody("description", request.getDescription().orElse(""));
+        builder.addTextBody("description", request.getDescription().orElse(""), ContentType.create("text/plain", Consts.UTF_8));
 
         post.setEntity(builder.build());
 
