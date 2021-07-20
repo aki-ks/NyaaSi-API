@@ -30,7 +30,7 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
     private final Session session;
 
     public NyaaSiAuthApiImpl(Session session) {
-        super(session.isSubekei());
+        super(session.isSukebei());
         this.session = session;
     }
 
