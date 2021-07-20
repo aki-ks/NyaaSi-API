@@ -49,14 +49,29 @@ public interface NyaaSiApi {
     TorrentInfo getTorrentInfo(int torrentId);
 
     /**
+     * Login with session cookie.
+     *
+     * This is a replacement for the username/password login function.
+     *
+     * @param sessionCookie The session cookie from a logged in browser.
+     */
+    NyaaSiAuthApi login(String sessionCookie);
+
+    /**
      * Login with username and password.
      *
      * Since this api call is based on parsing webpages, it might break anytime.
+     *
+     * @deprecated
+     * No longer works due to Google Captcha. Set session cookie manually by logging
+     * in through the browser and retrieving it from cookies in developer tools.
+     * Use {@link #login(String)} instead.
      *
      * @throws LoginException login failed
      * @throws WebScrapeException error while parsing webpage
      * @throws HttpException networking error
      */
+    @Deprecated
     NyaaSiAuthApi login(String username, String password);
 
 }

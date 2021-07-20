@@ -13,7 +13,6 @@ public class EditTorrentParser implements Parser<EditTorrentRequest> {
         List<Connection.KeyVal> form = ((FormElement)page.selectFirst("form[method=POST][enctype=multipart/form-data]")).formData();
 
         return new EditTorrentRequest(
-                ParseUtils.getFormValue(form, "csrf_token"),
                 ParseUtils.getFormValue(form, "display_name"),
                 ParseUtils.parseSubCategory(ParseUtils.getFormValue(form, "category"), false, isSukebei),
                 ParseUtils.getFormValue(form, "information"),

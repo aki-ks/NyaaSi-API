@@ -2,3 +2,10 @@
 /target
 *.class
 hs_err_*
+*.iml
+.idea/
+build/
+out/
+*.log
+*.tar
+.gradle

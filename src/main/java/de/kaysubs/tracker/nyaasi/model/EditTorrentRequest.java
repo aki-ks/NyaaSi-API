@@ -11,6 +11,11 @@ public class EditTorrentRequest {
     private boolean isRemake;
     private boolean isCompleted;
 
+    /**
+     * @deprecated CSRF tokens are no longer used on nyaa.si.
+     * Use {@link #EditTorrentRequest(String, SubCategory, String, String, boolean, boolean, boolean, boolean)} instead.
+     */
+    @Deprecated
     public EditTorrentRequest(String csrfToken, String name, SubCategory category, String information, String description,
                               boolean isAnonymous, boolean isHidden, boolean isRemake, boolean isCompleted) {
         this.csrfToken = csrfToken;
@@ -24,6 +29,16 @@ public class EditTorrentRequest {
         this.isCompleted = isCompleted;
     }
 
+    public EditTorrentRequest(String name, SubCategory category, String information, String description,
+                              boolean isAnonymous, boolean isHidden, boolean isRemake, boolean isCompleted) {
+        this(null, name, category, information, description, isAnonymous, isHidden, isRemake, isCompleted);
+
+    }
+
+    /**
+     * @deprecated CSRF tokens are no longer used on nyaa.si.
+     */
+    @Deprecated
     public String getCsrfToken() {
         return csrfToken;
     }
