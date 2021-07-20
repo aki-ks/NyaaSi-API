@@ -34,6 +34,21 @@ public class NyaaSiAuthApiImpl extends NyaaSiApiImpl implements NyaaSiAuthApi {
         this.session = session;
     }
 
+    /**
+     * @deprecated This method is no longer needed as the <code>isSukebei</code> parameter
+     * is redundant and can be pulled from the {@link Session}.
+     * Use {@link #NyaaSiAuthApiImpl(Session)} instead.
+     *
+     * Note, neither of these constructors should technically be used in client code, you
+     * should use {@link NyaaSiApi#getNyaa()} or {@link NyaaSiApi#getSukebei()} and then call
+     * the {@link NyaaSiApiImpl#login(String)} method to retrieve an instance of this class.
+     */
+    @Deprecated
+    public NyaaSiAuthApiImpl(Session session, boolean isSukebei) {
+        super(isSukebei);
+        this.session = session;
+    }
+
     public Session getSession() {
         return session;
     }
